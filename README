@@ -1,0 +1,22 @@
+A Linux-based network diagnostics and automation toolkit written in Python.
+
+## Planned Features
+
+- [ ] Interface Detection
+- [ ] IP / Subnet Detection
+- [ ] Default Gateway Detection
+- [ ] DNS Diagnostics
+- [ ] Ping Test
+- [ ] Packet Loss Test
+- [ ] LAN Discovery
+- [ ] Wi-Fi Diagnostics
+- [ ] iPerf3 Integration
+- [ ] Network Report Generator
+
+## Tech Stack
+
+- Python
+- Linux
+- iproute2
+- nmap
+- iPerf3
