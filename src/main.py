@@ -53,11 +53,27 @@ def get_dns_servers():
 
     return dns_servers
 
-
-
 def show_dns_servers():
     dns_servers = get_dns_servers()
     if not dns_servers:
         print("No DNS servers found")
     else:
         print(dns_servers)
+
+def get_wifi_info(interface):
+    output = run_command(["iw","dev",interface,"link"])
+    if not output or "Not connected" in output:
+        return None
+    wifi = {}
+    ssid = re.search(r"SSID:\s+(.+)",output)
+    signal = re.search(r"signal:\s+(-?\d+)\s+dBm",output)
+    tx_rate = re.search(r"tx bitrate:\s+(.+)",output)
+
+    if ssid:
+        wifi["SSID"] = ssid.group(1)
+    if signal:
+        wifi["Signal"] = signal.group(1)
+    if tx_rate:
+        wifi["TX Rate"] = tx_rate.group(1)
+
+    return wifi
