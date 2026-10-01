@@ -10,7 +10,7 @@ def run_command(command):
     except Exception as error:
         return "Command Error:"+{error}
 
-def get_work_info():
+def get_Network_info():
     route = run_command(["ip","route","get","1.1.1.1"])
 
     interface = "Unknown"
@@ -77,3 +77,76 @@ def get_wifi_info(interface):
         wifi["TX Rate"] = tx_rate.group(1)
 
     return wifi
+
+def ping_test(host):
+    result = subprocess.run(["ping","-c","1","-W","2",host],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    return result.returncode == 0
+
+def dns_test():
+    try:
+        socket.gethostbyname("example.com")
+        return True
+    except socket.gaierror:
+        return False
+
+def main():
+    print("="*45)
+    print("     uConsole Network Toolkit v0.1")
+    print("="*45)
+
+    interface, ip_address, gateway=(get_Network_info())
+
+    print()
+
+    print(f"Hostname    :{socket.gethostname()}")
+    print(f"Interface   :{interface}")
+    print(f"IPv4        :{ip_address}")
+    print(f"Gateway     :{gateway}")
+
+    dns_servers = get_dns_servers()
+    
+    if  dns_servers:
+        print(f"DNS         :{','.join(dns_servers)}")
+    else:
+        print("DNS          ：Unknown")
+
+    wifi = get_wifi_info(interface)
+
+    if wifi:
+        print()
+        print("[Wi-Fi]")
+
+        for key, value in wifi.items():
+
+            print(f"{key:<10}:{value}")
+    print()
+    print("[Connectivity]")
+
+    gateway_ok = False
+
+    if gateway != "Unknown":
+        gateway_ok=ping_test(gateway)
+    interface_ok = ping_test("1.1.1.1")
+
+    dns_ok = dns_test()
+    internet_ok = ping_test("1.1.1.1")
+
+    print(f"Gateway    : "f"{'OK' if gateway_ok else 'FAIL'}")
+    print(f"Internet   : "f"{'OK' if internet_ok else 'FAIL'}")
+    print(f"DNS        : "f"{'OK' if dns_ok else 'FAIL'}")
+
+    print()
+    print("[Diagnosis]")
+
+    if not gateway_ok:
+        print("Cannot reach local gateway")
+    elif not interface_ok:
+        print("LAN works, but Internet access failed.")
+    elif not dns_ok:
+        print("Internet works, but DNS resolution failed.")
+    else:
+        print("Network connection looks healthy.")
+
+    print("="*45)
+
+if __name__ == "__main__": main()
